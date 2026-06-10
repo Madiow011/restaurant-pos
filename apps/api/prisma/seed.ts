@@ -1,12 +1,16 @@
-// apps/api/prisma/seed.ts
 import { PrismaClient, TableStatus } from '@prisma/client';
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: 'file:./prisma/dev.db',
+    },
+  },
+});
 
 async function main() {
   console.log('🌱 Seeding database...');
 
-  // ---- Categories ----
   const categories = await Promise.all([
     prisma.category.upsert({
       where: { name: 'อาหารจานหลัก' },
@@ -30,27 +34,21 @@ async function main() {
     }),
   ]);
 
-  // ---- Products ----
   await Promise.all([
-    // อาหารจานหลัก
     prisma.product.create({ data: { name: 'ข้าวผัดกุ้ง', price: 85, categoryId: categories[0].id, sortOrder: 1 } }),
     prisma.product.create({ data: { name: 'ผัดกระเพราหมูสับ', price: 75, categoryId: categories[0].id, sortOrder: 2 } }),
     prisma.product.create({ data: { name: 'ต้มยำกุ้ง', price: 150, categoryId: categories[0].id, sortOrder: 3 } }),
     prisma.product.create({ data: { name: 'ผัดไทยกุ้งสด', price: 95, categoryId: categories[0].id, sortOrder: 4 } }),
-    // เครื่องดื่ม
     prisma.product.create({ data: { name: 'ชาเย็น', price: 35, categoryId: categories[1].id, sortOrder: 1 } }),
     prisma.product.create({ data: { name: 'กาแฟเย็น', price: 40, categoryId: categories[1].id, sortOrder: 2 } }),
     prisma.product.create({ data: { name: 'น้ำเปล่า', price: 15, categoryId: categories[1].id, sortOrder: 3 } }),
     prisma.product.create({ data: { name: 'โค้ก/เป๊ปซี่', price: 25, categoryId: categories[1].id, sortOrder: 4 } }),
-    // ของทานเล่น
     prisma.product.create({ data: { name: 'ปอเปี๊ยะทอด', price: 60, categoryId: categories[2].id, sortOrder: 1 } }),
     prisma.product.create({ data: { name: 'ไก่ทอด (3 ชิ้น)', price: 80, categoryId: categories[2].id, sortOrder: 2 } }),
-    // ของหวาน
     prisma.product.create({ data: { name: 'ไอศกรีมกะทิ', price: 45, categoryId: categories[3].id, sortOrder: 1 } }),
     prisma.product.create({ data: { name: 'ข้าวเหนียวมะม่วง', price: 65, categoryId: categories[3].id, sortOrder: 2 } }),
   ]);
 
-  // ---- Tables ----
   for (let i = 1; i <= 10; i++) {
     await prisma.table.upsert({
       where: { number: i },
