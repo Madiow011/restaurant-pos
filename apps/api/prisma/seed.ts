@@ -1,37 +1,18 @@
+import 'dotenv/config';
 import { PrismaClient, TableStatus } from '@prisma/client';
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 
-const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: 'file:./prisma/dev.db',
-    },
-  },
-});
+const adapter = new PrismaBetterSqlite3({ url: 'file:./prisma/dev.db' });
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log('🌱 Seeding database...');
 
   const categories = await Promise.all([
-    prisma.category.upsert({
-      where: { name: 'อาหารจานหลัก' },
-      update: {},
-      create: { name: 'อาหารจานหลัก', icon: '🍛', sortOrder: 1 },
-    }),
-    prisma.category.upsert({
-      where: { name: 'เครื่องดื่ม' },
-      update: {},
-      create: { name: 'เครื่องดื่ม', icon: '🥤', sortOrder: 2 },
-    }),
-    prisma.category.upsert({
-      where: { name: 'ของทานเล่น' },
-      update: {},
-      create: { name: 'ของทานเล่น', icon: '🍟', sortOrder: 3 },
-    }),
-    prisma.category.upsert({
-      where: { name: 'ของหวาน' },
-      update: {},
-      create: { name: 'ของหวาน', icon: '🍰', sortOrder: 4 },
-    }),
+    prisma.category.upsert({ where: { name: 'อาหารจานหลัก' }, update: {}, create: { name: 'อาหารจานหลัก', icon: '🍛', sortOrder: 1 } }),
+    prisma.category.upsert({ where: { name: 'เครื่องดื่ม' }, update: {}, create: { name: 'เครื่องดื่ม', icon: '🥤', sortOrder: 2 } }),
+    prisma.category.upsert({ where: { name: 'ของทานเล่น' }, update: {}, create: { name: 'ของทานเล่น', icon: '🍟', sortOrder: 3 } }),
+    prisma.category.upsert({ where: { name: 'ของหวาน' }, update: {}, create: { name: 'ของหวาน', icon: '🍰', sortOrder: 4 } }),
   ]);
 
   await Promise.all([
@@ -53,12 +34,7 @@ async function main() {
     await prisma.table.upsert({
       where: { number: i },
       update: {},
-      create: {
-        number: i,
-        name: `โต๊ะ ${i}`,
-        capacity: i <= 6 ? 4 : 6,
-        status: TableStatus.AVAILABLE,
-      },
+      create: { number: i, name: `โต๊ะ ${i}`, capacity: i <= 6 ? 4 : 6, status: TableStatus.AVAILABLE },
     });
   }
 

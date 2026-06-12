@@ -1,30 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+require("dotenv/config");
 const client_1 = require("@prisma/client");
-const prisma = new client_1.PrismaClient();
+const adapter_better_sqlite3_1 = require("@prisma/adapter-better-sqlite3");
+const adapter = new adapter_better_sqlite3_1.PrismaBetterSqlite3({ url: 'file:./prisma/dev.db' });
+const prisma = new client_1.PrismaClient({ adapter });
 async function main() {
     console.log('🌱 Seeding database...');
     const categories = await Promise.all([
-        prisma.category.upsert({
-            where: { name: 'อาหารจานหลัก' },
-            update: {},
-            create: { name: 'อาหารจานหลัก', icon: '🍛', sortOrder: 1 },
-        }),
-        prisma.category.upsert({
-            where: { name: 'เครื่องดื่ม' },
-            update: {},
-            create: { name: 'เครื่องดื่ม', icon: '🥤', sortOrder: 2 },
-        }),
-        prisma.category.upsert({
-            where: { name: 'ของทานเล่น' },
-            update: {},
-            create: { name: 'ของทานเล่น', icon: '🍟', sortOrder: 3 },
-        }),
-        prisma.category.upsert({
-            where: { name: 'ของหวาน' },
-            update: {},
-            create: { name: 'ของหวาน', icon: '🍰', sortOrder: 4 },
-        }),
+        prisma.category.upsert({ where: { name: 'อาหารจานหลัก' }, update: {}, create: { name: 'อาหารจานหลัก', icon: '🍛', sortOrder: 1 } }),
+        prisma.category.upsert({ where: { name: 'เครื่องดื่ม' }, update: {}, create: { name: 'เครื่องดื่ม', icon: '🥤', sortOrder: 2 } }),
+        prisma.category.upsert({ where: { name: 'ของทานเล่น' }, update: {}, create: { name: 'ของทานเล่น', icon: '🍟', sortOrder: 3 } }),
+        prisma.category.upsert({ where: { name: 'ของหวาน' }, update: {}, create: { name: 'ของหวาน', icon: '🍰', sortOrder: 4 } }),
     ]);
     await Promise.all([
         prisma.product.create({ data: { name: 'ข้าวผัดกุ้ง', price: 85, categoryId: categories[0].id, sortOrder: 1 } }),
@@ -44,12 +31,7 @@ async function main() {
         await prisma.table.upsert({
             where: { number: i },
             update: {},
-            create: {
-                number: i,
-                name: `โต๊ะ ${i}`,
-                capacity: i <= 6 ? 4 : 6,
-                status: client_1.TableStatus.AVAILABLE,
-            },
+            create: { number: i, name: `โต๊ะ ${i}`, capacity: i <= 6 ? 4 : 6, status: client_1.TableStatus.AVAILABLE },
         });
     }
     console.log('✅ Seed complete!');
