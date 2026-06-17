@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Patch, Body, ParseIntPipe } from '@nestjs/common';
 import { TablesService } from './tables.service';
-import { TableStatus } from '@prisma/client';
+import { TableStatus } from '../generated/prisma/client';
 
 @Controller('tables')
 export class TablesController {

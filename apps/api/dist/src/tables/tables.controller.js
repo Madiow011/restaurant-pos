@@ -11,12 +11,11 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TablesController = void 0;
 const common_1 = require("@nestjs/common");
 const tables_service_1 = require("./tables.service");
-const client_1 = require("@prisma/client");
+const client_1 = require("../generated/prisma/client");
 let TablesController = class TablesController {
     constructor(tablesService) {
         this.tablesService = tablesService;
@@ -50,7 +49,7 @@ __decorate([
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
     __param(1, (0, common_1.Body)('status')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number, typeof (_a = typeof client_1.TableStatus !== "undefined" && client_1.TableStatus) === "function" ? _a : Object]),
+    __metadata("design:paramtypes", [Number, String]),
     __metadata("design:returntype", void 0)
 ], TablesController.prototype, "updateStatus", null);
 exports.TablesController = TablesController = __decorate([
