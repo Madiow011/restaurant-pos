@@ -33,12 +33,12 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-const client_1 = require("../src/generated/prisma/client");
 const adapter_better_sqlite3_1 = require("@prisma/adapter-better-sqlite3");
 const path = __importStar(require("path"));
+const { PrismaClient, TableStatus } = require(path.join(__dirname, '../src/generated/prisma/client'));
 const dbPath = path.resolve(__dirname, './dev.db');
 const adapter = new adapter_better_sqlite3_1.PrismaBetterSqlite3({ url: `file:${dbPath}` });
-const prisma = new client_1.PrismaClient({ adapter });
+const prisma = new PrismaClient({ adapter });
 async function main() {
     console.log('🌱 Seeding database...');
     const categories = await Promise.all([
@@ -65,7 +65,7 @@ async function main() {
         await prisma.table.upsert({
             where: { number: i },
             update: {},
-            create: { number: i, name: `โต๊ะ ${i}`, capacity: i <= 6 ? 4 : 6, status: client_1.TableStatus.AVAILABLE },
+            create: { number: i, name: `โต๊ะ ${i}`, capacity: i <= 6 ? 4 : 6, status: TableStatus.AVAILABLE },
         });
     }
     console.log('✅ Seed complete!');

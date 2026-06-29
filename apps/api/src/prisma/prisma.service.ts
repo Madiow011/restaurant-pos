@@ -1,21 +1,31 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { PrismaClient } from '../generated/prisma/client';
 import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import * as path from 'path';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { PrismaClient } = require(path.join(__dirname, '../../generated/prisma/client'));
+
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+export class PrismaService implements OnModuleInit, OnModuleDestroy {
+  private client: any;
+
   constructor() {
-    const dbPath = path.resolve(__dirname, '../../prisma/dev.db');
+    const dbPath = path.resolve(__dirname, '../../../prisma/dev.db');
     const adapter = new PrismaBetterSqlite3({ url: `file:${dbPath}` });
-    super({ adapter });
+    this.client = new PrismaClient({ adapter });
   }
 
+  get category() { return this.client.category; }
+  get product() { return this.client.product; }
+  get table() { return this.client.table; }
+  get order() { return this.client.order; }
+  get orderItem() { return this.client.orderItem; }
+
   async onModuleInit() {
-    await this.$connect();
+    await this.client.$connect();
   }
 
   async onModuleDestroy() {
-    await this.$disconnect();
+    await this.client.$disconnect();
   }
 }

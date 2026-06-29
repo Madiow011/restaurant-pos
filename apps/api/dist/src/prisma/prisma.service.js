@@ -44,20 +44,25 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PrismaService = void 0;
 const common_1 = require("@nestjs/common");
-const client_1 = require("../generated/prisma/client");
 const adapter_better_sqlite3_1 = require("@prisma/adapter-better-sqlite3");
 const path = __importStar(require("path"));
-let PrismaService = class PrismaService extends client_1.PrismaClient {
+const { PrismaClient } = require(path.join(__dirname, '../../generated/prisma/client'));
+let PrismaService = class PrismaService {
     constructor() {
-        const dbPath = path.resolve(__dirname, '../../prisma/dev.db');
+        const dbPath = path.resolve(__dirname, '../../../prisma/dev.db');
         const adapter = new adapter_better_sqlite3_1.PrismaBetterSqlite3({ url: `file:${dbPath}` });
-        super({ adapter });
+        this.client = new PrismaClient({ adapter });
     }
+    get category() { return this.client.category; }
+    get product() { return this.client.product; }
+    get table() { return this.client.table; }
+    get order() { return this.client.order; }
+    get orderItem() { return this.client.orderItem; }
     async onModuleInit() {
-        await this.$connect();
+        await this.client.$connect();
     }
     async onModuleDestroy() {
-        await this.$disconnect();
+        await this.client.$disconnect();
     }
 };
 exports.PrismaService = PrismaService;

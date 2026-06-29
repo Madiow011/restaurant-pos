@@ -2,6 +2,13 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateOrderDto, CheckoutOrderDto } from './dto/create-order.dto';
 
+interface ProductRecord {
+  id: number;
+  name: string;
+  price: number;
+  categoryId: number;
+}
+
 @Injectable()
 export class OrdersService {
   constructor(private prisma: PrismaService) {}
@@ -14,10 +21,10 @@ export class OrdersService {
   }
 
   async create(dto: CreateOrderDto) {
-    const products = await this.prisma.product.findMany({
+    const products: ProductRecord[] = await this.prisma.product.findMany({
       where: { id: { in: dto.items.map((i) => i.productId) } },
     });
-    const productMap = new Map(products.map((p) => [p.id, p]));
+    const productMap = new Map<number, ProductRecord>(products.map((p) => [p.id, p]));
 
     const items = dto.items.map((item) => {
       const product = productMap.get(item.productId);
@@ -75,10 +82,10 @@ export class OrdersService {
     const order = await this.prisma.order.findUnique({ where: { id: orderId } });
     if (!order) throw new NotFoundException('Order not found');
 
-    const products = await this.prisma.product.findMany({
+    const products: ProductRecord[] = await this.prisma.product.findMany({
       where: { id: { in: dto.items.map((i) => i.productId) } },
     });
-    const productMap = new Map(products.map((p) => [p.id, p]));
+    const productMap = new Map<number, ProductRecord>(products.map((p) => [p.id, p]));
 
     const items = dto.items.map((item) => {
       const product = productMap.get(item.productId);
@@ -95,7 +102,7 @@ export class OrdersService {
 
     await this.prisma.orderItem.createMany({ data: items });
 
-    const allItems = await this.prisma.orderItem.findMany({ where: { orderId } });
+    const allItems: any[] = await this.prisma.orderItem.findMany({ where: { orderId } });
     const subtotal = allItems.reduce((sum, i) => sum + i.subtotal, 0);
     const vatAmount = subtotal * 0.07;
 
@@ -121,7 +128,7 @@ export class OrdersService {
     });
 
     await this.prisma.table.update({
-      where: { id: order.tableId },
+      where: { id: (order as any).tableId },
       data: { status: 'AVAILABLE' },
     });
 
@@ -138,7 +145,7 @@ export class OrdersService {
     });
 
     await this.prisma.table.update({
-      where: { id: order.tableId },
+      where: { id: (order as any).tableId },
       data: { status: 'AVAILABLE' },
     });
 

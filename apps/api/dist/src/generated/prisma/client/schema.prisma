@@ -1,0 +1,111 @@
+generator client {
+  provider     = "prisma-client-js"
+  output       = "../src/generated/prisma/client"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  icon      String?
+  sortOrder Int       @default(0)
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  products  Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id          Int         @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float
+  imageUrl    String?
+  isActive    Boolean     @default(true)
+  sortOrder   Int         @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  categoryId  Int
+  category    Category    @relation(fields: [categoryId], references: [id])
+  orderItems  OrderItem[]
+
+  @@map("products")
+}
+
+model Table {
+  id        Int         @id @default(autoincrement())
+  number    Int         @unique
+  name      String?
+  capacity  Int         @default(4)
+  status    TableStatus @default(AVAILABLE)
+  posX      Int?
+  posY      Int?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  orders    Order[]
+
+  @@map("tables")
+}
+
+enum TableStatus {
+  AVAILABLE
+  OCCUPIED
+  RESERVED
+  CLEANING
+}
+
+model Order {
+  id            Int            @id @default(autoincrement())
+  orderNumber   String         @unique
+  status        OrderStatus    @default(OPEN)
+  subtotal      Float          @default(0)
+  vatRate       Float          @default(0.07)
+  vatAmount     Float          @default(0)
+  totalAmount   Float          @default(0)
+  paymentMethod PaymentMethod?
+  paidAt        DateTime?
+  note          String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  tableId       Int
+  table         Table          @relation(fields: [tableId], references: [id])
+  orderItems    OrderItem[]
+
+  @@map("orders")
+}
+
+enum OrderStatus {
+  OPEN
+  CONFIRMED
+  READY
+  PAID
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  CREDIT_CARD
+  QR_CODE
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  quantity  Int      @default(1)
+  unitPrice Float
+  subtotal  Float
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orderId   Int
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}

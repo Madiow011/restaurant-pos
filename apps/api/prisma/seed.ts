@@ -1,6 +1,8 @@
-import { PrismaClient, TableStatus } from '../src/generated/prisma/client';
 import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
 import * as path from 'path';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { PrismaClient, TableStatus } = require(path.join(__dirname, '../src/generated/prisma/client'));
 
 const dbPath = path.resolve(__dirname, './dev.db');
 const adapter = new PrismaBetterSqlite3({ url: `file:${dbPath}` });
@@ -44,4 +46,4 @@ async function main() {
 
 main()
   .catch((e) => { console.error(e); process.exit(1); })
-  .finally(async () => { await (prisma as any).$disconnect(); });
+  .finally(async () => { await prisma.$disconnect(); });

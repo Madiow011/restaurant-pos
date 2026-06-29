@@ -12,6 +12,6 @@
     "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\" \"npm run dev:desktop\""
   },
   "devDependencies": {
-    "concurrently": "^8.2.0"
+    "concurrently": "^8.2.2"
   }
 }
