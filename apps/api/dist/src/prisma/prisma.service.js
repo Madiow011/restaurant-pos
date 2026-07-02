@@ -46,10 +46,22 @@ exports.PrismaService = void 0;
 const common_1 = require("@nestjs/common");
 const adapter_better_sqlite3_1 = require("@prisma/adapter-better-sqlite3");
 const path = __importStar(require("path"));
-const { PrismaClient } = require(path.join(__dirname, '../../generated/prisma/client'));
+const fs = __importStar(require("fs"));
 let PrismaService = class PrismaService {
     constructor() {
-        const dbPath = path.resolve(__dirname, '../../../prisma/dev.db');
+        let apiRoot = __dirname;
+        while (apiRoot !== path.dirname(apiRoot)) {
+            const pkgPath = path.join(apiRoot, 'package.json');
+            if (fs.existsSync(pkgPath)) {
+                const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+                if (pkg.name === 'api')
+                    break;
+            }
+            apiRoot = path.dirname(apiRoot);
+        }
+        const generatedPath = path.join(apiRoot, 'src', 'generated', 'prisma', 'client');
+        const dbPath = path.join(apiRoot, 'prisma', 'dev.db');
+        const { PrismaClient } = require(generatedPath);
         const adapter = new adapter_better_sqlite3_1.PrismaBetterSqlite3({ url: `file:${dbPath}` });
         this.client = new PrismaClient({ adapter });
     }
@@ -58,12 +70,8 @@ let PrismaService = class PrismaService {
     get table() { return this.client.table; }
     get order() { return this.client.order; }
     get orderItem() { return this.client.orderItem; }
-    async onModuleInit() {
-        await this.client.$connect();
-    }
-    async onModuleDestroy() {
-        await this.client.$disconnect();
-    }
+    async onModuleInit() { await this.client.$connect(); }
+    async onModuleDestroy() { await this.client.$disconnect(); }
 };
 exports.PrismaService = PrismaService;
 exports.PrismaService = PrismaService = __decorate([
