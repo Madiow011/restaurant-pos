@@ -8,9 +8,11 @@ import { TablesController } from './tables/tables.controller';
 import { TablesService } from './tables/tables.service';
 import { OrdersController } from './orders/orders.controller';
 import { OrdersService } from './orders/orders.service';
+import { PaymentModule } from './payment/payment.module';
+import { ReceiptModule } from './receipt/receipt.module';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, PaymentModule, ReceiptModule],
   controllers: [
     CategoriesController,
     ProductsController,

@@ -17,12 +17,14 @@ const tables_controller_1 = require("./tables/tables.controller");
 const tables_service_1 = require("./tables/tables.service");
 const orders_controller_1 = require("./orders/orders.controller");
 const orders_service_1 = require("./orders/orders.service");
+const payment_module_1 = require("./payment/payment.module");
+const receipt_module_1 = require("./receipt/receipt.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule],
+        imports: [prisma_module_1.PrismaModule, payment_module_1.PaymentModule, receipt_module_1.ReceiptModule],
         controllers: [
             categories_controller_1.CategoriesController,
             products_controller_1.ProductsController,
