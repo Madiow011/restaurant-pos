@@ -6,12 +6,16 @@
     "apps/*"
   ],
   "scripts": {
-    "dev:web": "npm run dev --workspace=apps/web",
     "dev:api": "npm run start:dev --workspace=apps/api",
+    "dev:web": "npm run dev --workspace=apps/web",
     "dev:desktop": "npm run start --workspace=apps/desktop",
-    "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\" \"npm run dev:desktop\""
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\"",
+    "build:api": "npm run build --workspace=apps/api",
+    "build:web": "npm run build --workspace=apps/web",
+    "build:all": "npm run build:api && npm run build:web",
+    "start": "npm run start --workspace=apps/desktop"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.0"
   }
 }
