@@ -53,14 +53,31 @@ let PrismaService = class PrismaService {
         while (apiRoot !== path.dirname(apiRoot)) {
             const pkgPath = path.join(apiRoot, 'package.json');
             if (fs.existsSync(pkgPath)) {
-                const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-                if (pkg.name === 'api')
-                    break;
+                try {
+                    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+                    if (pkg.name === 'api')
+                        break;
+                }
+                catch { }
             }
             apiRoot = path.dirname(apiRoot);
         }
-        const generatedPath = path.join(apiRoot, 'src', 'generated', 'prisma', 'client');
+        const candidates = [
+            path.join(apiRoot, 'dist', 'src', 'generated', 'prisma', 'client'),
+            path.join(apiRoot, 'src', 'generated', 'prisma', 'client'),
+            path.join(apiRoot, 'generated', 'prisma', 'client'),
+        ];
+        let generatedPath = candidates[0];
+        for (const p of candidates) {
+            if (fs.existsSync(p)) {
+                generatedPath = p;
+                break;
+            }
+        }
         const dbPath = path.join(apiRoot, 'prisma', 'dev.db');
+        console.log('[Prisma] apiRoot:', apiRoot);
+        console.log('[Prisma] generatedPath:', generatedPath, 'exists:', fs.existsSync(generatedPath));
+        console.log('[Prisma] dbPath:', dbPath, 'exists:', fs.existsSync(dbPath));
         const { PrismaClient } = require(generatedPath);
         const adapter = new adapter_better_sqlite3_1.PrismaBetterSqlite3({ url: `file:${dbPath}` });
         this.client = new PrismaClient({ adapter });

@@ -2,8 +2,6 @@ import type { ForgeConfig } from '@electron-forge/shared-types';
 import { MakerSquirrel } from '@electron-forge/maker-squirrel';
 import { MakerZIP } from '@electron-forge/maker-zip';
 import { WebpackPlugin } from '@electron-forge/plugin-webpack';
-import { FusesPlugin } from '@electron-forge/plugin-fuses';
-import { FuseV1Options, FuseVersion } from '@electron/fuses';
 
 import { mainConfig } from './webpack.main.config';
 import { rendererConfig } from './webpack.renderer.config';
@@ -12,10 +10,12 @@ const config: ForgeConfig = {
   packagerConfig: {
     name: 'RestaurantPOS',
     productName: 'Restaurant POS',
-    asar: false, // ปิด asar เพื่อให้ node modules เข้าถึงได้
+    asar: false,
     extraResource: [
       '../../apps/api/dist',
+      '../../apps/api/src/generated',
       '../../apps/api/prisma',
+      '../../apps/api/node_modules',
       '../../apps/web/.next/standalone',
       '../../apps/web/public',
     ],
@@ -45,15 +45,6 @@ const config: ForgeConfig = {
       },
       port: 3100,
       loggerPort: 9001,
-    }),
-    new FusesPlugin({
-      version: FuseVersion.V1,
-      [FuseV1Options.RunAsNode]: false,
-      [FuseV1Options.EnableCookieEncryption]: true,
-      [FuseV1Options.EnableNodeOptionsEnvironmentVariable]: false,
-      [FuseV1Options.EnableNodeCliInspectArguments]: false,
-      [FuseV1Options.EnableEmbeddedAsarIntegrityValidation]: false,
-      [FuseV1Options.OnlyLoadAppFromAsar]: false,
     }),
   ],
 };
