@@ -26,5 +26,6 @@ export declare class ReceiptService {
             totalAmount: any;
         };
     }>;
-    generateReceiptHTML(orderId: number): Promise<string>;
+    generateCustomerReceiptHTML(orderId: number): Promise<string>;
+    generateKitchenOrderHTML(orderId: number): Promise<string>;
 }

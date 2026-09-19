@@ -10,20 +10,11 @@ import { OrdersController } from './orders/orders.controller';
 import { OrdersService } from './orders/orders.service';
 import { PaymentModule } from './payment/payment.module';
 import { ReceiptModule } from './receipt/receipt.module';
+import { ReportsModule } from './reports/reports.module';
 
 @Module({
-  imports: [PrismaModule, PaymentModule, ReceiptModule],
-  controllers: [
-    CategoriesController,
-    ProductsController,
-    TablesController,
-    OrdersController,
-  ],
-  providers: [
-    CategoriesService,
-    ProductsService,
-    TablesService,
-    OrdersService,
-  ],
+  imports: [PrismaModule, PaymentModule, ReceiptModule, ReportsModule],
+  controllers: [CategoriesController, ProductsController, TablesController, OrdersController],
+  providers: [CategoriesService, ProductsService, TablesService, OrdersService],
 })
 export class AppModule {}

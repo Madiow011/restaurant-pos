@@ -11,10 +11,21 @@ export class ReceiptController {
     return this.receiptService.getReceiptData(orderId);
   }
 
+  @Get(':orderId/customer')
+  @Header('Content-Type', 'text/html; charset=utf-8')
+  async customerReceipt(@Param('orderId', ParseIntPipe) orderId: number, @Res() res: Response) {
+    res.send(await this.receiptService.generateCustomerReceiptHTML(orderId));
+  }
+
+  @Get(':orderId/kitchen')
+  @Header('Content-Type', 'text/html; charset=utf-8')
+  async kitchenOrder(@Param('orderId', ParseIntPipe) orderId: number, @Res() res: Response) {
+    res.send(await this.receiptService.generateKitchenOrderHTML(orderId));
+  }
+
   @Get(':orderId/html')
   @Header('Content-Type', 'text/html; charset=utf-8')
-  async getReceiptHTML(@Param('orderId', ParseIntPipe) orderId: number, @Res() res: Response) {
-    const html = await this.receiptService.generateReceiptHTML(orderId);
-    res.send(html);
+  async html(@Param('orderId', ParseIntPipe) orderId: number, @Res() res: Response) {
+    res.send(await this.receiptService.generateCustomerReceiptHTML(orderId));
   }
 }

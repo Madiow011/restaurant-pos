@@ -18,19 +18,34 @@ let ProductsService = class ProductsService {
     }
     findAll(categoryId) {
         return this.prisma.product.findMany({
-            where: {
-                isActive: true,
-                ...(categoryId ? { categoryId } : {}),
-            },
+            where: { ...(categoryId ? { categoryId } : {}) },
             include: { category: true },
             orderBy: [{ categoryId: 'asc' }, { sortOrder: 'asc' }],
         });
     }
     findOne(id) {
-        return this.prisma.product.findUnique({
-            where: { id },
-            include: { category: true },
-        });
+        return this.prisma.product.findUnique({ where: { id }, include: { category: true } });
+    }
+    create(data) {
+        return this.prisma.product.create({ data, include: { category: true } });
+    }
+    async update(id, data) {
+        const product = await this.prisma.product.findUnique({ where: { id } });
+        if (!product)
+            throw new common_1.NotFoundException('Product not found');
+        return this.prisma.product.update({ where: { id }, data, include: { category: true } });
+    }
+    async remove(id) {
+        const product = await this.prisma.product.findUnique({ where: { id } });
+        if (!product)
+            throw new common_1.NotFoundException('Product not found');
+        return this.prisma.product.update({ where: { id }, data: { isActive: false } });
+    }
+    async hardDelete(id) {
+        const product = await this.prisma.product.findUnique({ where: { id } });
+        if (!product)
+            throw new common_1.NotFoundException('Product not found');
+        return this.prisma.product.delete({ where: { id } });
     }
 };
 exports.ProductsService = ProductsService;

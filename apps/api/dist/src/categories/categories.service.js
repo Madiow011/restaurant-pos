@@ -18,12 +18,33 @@ let CategoriesService = class CategoriesService {
     }
     findAll() {
         return this.prisma.category.findMany({
-            where: { isActive: true },
             orderBy: { sortOrder: 'asc' },
-            include: {
-                _count: { select: { products: true } },
-            },
+            include: { _count: { select: { products: true } } },
         });
+    }
+    findOne(id) {
+        return this.prisma.category.findUnique({ where: { id } });
+    }
+    create(data) {
+        return this.prisma.category.create({ data });
+    }
+    async update(id, data) {
+        const cat = await this.prisma.category.findUnique({ where: { id } });
+        if (!cat)
+            throw new common_1.NotFoundException('Category not found');
+        return this.prisma.category.update({ where: { id }, data });
+    }
+    async remove(id) {
+        const cat = await this.prisma.category.findUnique({
+            where: { id },
+            include: { _count: { select: { products: true } } },
+        });
+        if (!cat)
+            throw new common_1.NotFoundException('Category not found');
+        if (cat._count.products > 0) {
+            return this.prisma.category.update({ where: { id }, data: { isActive: false } });
+        }
+        return this.prisma.category.delete({ where: { id } });
     }
 };
 exports.CategoriesService = CategoriesService;

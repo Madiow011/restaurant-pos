@@ -2,18 +2,11 @@
   "name": "restaurant-pos",
   "version": "1.0.0",
   "private": true,
-  "workspaces": [
-    "apps/*"
-  ],
+  "workspaces": ["apps/api", "apps/web"],
   "scripts": {
     "dev:api": "npm run start:dev --workspace=apps/api",
     "dev:web": "npm run dev --workspace=apps/web",
-    "dev:desktop": "npm run start --workspace=apps/desktop",
-    "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\"",
-    "build:api": "npm run build --workspace=apps/api",
-    "build:web": "npm run build --workspace=apps/web",
-    "build:all": "npm run build:api && npm run build:web",
-    "start": "npm run start --workspace=apps/desktop"
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\""
   },
   "devDependencies": {
     "concurrently": "^8.2.0"

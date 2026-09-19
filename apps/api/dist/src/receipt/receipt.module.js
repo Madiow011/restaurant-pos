@@ -14,10 +14,6 @@ let ReceiptModule = class ReceiptModule {
 };
 exports.ReceiptModule = ReceiptModule;
 exports.ReceiptModule = ReceiptModule = __decorate([
-    (0, common_1.Module)({
-        controllers: [receipt_controller_1.ReceiptController],
-        providers: [receipt_service_1.ReceiptService],
-        exports: [receipt_service_1.ReceiptService],
-    })
+    (0, common_1.Module)({ controllers: [receipt_controller_1.ReceiptController], providers: [receipt_service_1.ReceiptService], exports: [receipt_service_1.ReceiptService] })
 ], ReceiptModule);
 //# sourceMappingURL=receipt.module.js.map

@@ -22,9 +22,15 @@ let ProductsController = class ProductsController {
     findAll(categoryId) {
         return this.productsService.findAll(categoryId ? parseInt(categoryId) : undefined);
     }
-    findOne(id) {
-        return this.productsService.findOne(id);
+    findOne(id) { return this.productsService.findOne(id); }
+    create(body) {
+        return this.productsService.create(body);
     }
+    update(id, body) {
+        return this.productsService.update(id, body);
+    }
+    remove(id) { return this.productsService.remove(id); }
+    hardDelete(id) { return this.productsService.hardDelete(id); }
 };
 exports.ProductsController = ProductsController;
 __decorate([
@@ -41,6 +47,35 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], ProductsController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.Post)(),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], ProductsController.prototype, "create", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", void 0)
+], ProductsController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], ProductsController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Delete)(':id/hard'),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], ProductsController.prototype, "hardDelete", null);
 exports.ProductsController = ProductsController = __decorate([
     (0, common_1.Controller)('products'),
     __metadata("design:paramtypes", [products_service_1.ProductsService])

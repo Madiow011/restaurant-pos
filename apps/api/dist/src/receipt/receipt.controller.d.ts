@@ -27,5 +27,7 @@ export declare class ReceiptController {
             totalAmount: any;
         };
     }>;
-    getReceiptHTML(orderId: number, res: Response): Promise<void>;
+    customerReceipt(orderId: number, res: Response): Promise<void>;
+    kitchenOrder(orderId: number, res: Response): Promise<void>;
+    html(orderId: number, res: Response): Promise<void>;
 }

@@ -22,9 +22,14 @@ let ReceiptController = class ReceiptController {
     getReceiptData(orderId) {
         return this.receiptService.getReceiptData(orderId);
     }
-    async getReceiptHTML(orderId, res) {
-        const html = await this.receiptService.generateReceiptHTML(orderId);
-        res.send(html);
+    async customerReceipt(orderId, res) {
+        res.send(await this.receiptService.generateCustomerReceiptHTML(orderId));
+    }
+    async kitchenOrder(orderId, res) {
+        res.send(await this.receiptService.generateKitchenOrderHTML(orderId));
+    }
+    async html(orderId, res) {
+        res.send(await this.receiptService.generateCustomerReceiptHTML(orderId));
     }
 };
 exports.ReceiptController = ReceiptController;
@@ -36,6 +41,24 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], ReceiptController.prototype, "getReceiptData", null);
 __decorate([
+    (0, common_1.Get)(':orderId/customer'),
+    (0, common_1.Header)('Content-Type', 'text/html; charset=utf-8'),
+    __param(0, (0, common_1.Param)('orderId', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", Promise)
+], ReceiptController.prototype, "customerReceipt", null);
+__decorate([
+    (0, common_1.Get)(':orderId/kitchen'),
+    (0, common_1.Header)('Content-Type', 'text/html; charset=utf-8'),
+    __param(0, (0, common_1.Param)('orderId', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", Promise)
+], ReceiptController.prototype, "kitchenOrder", null);
+__decorate([
     (0, common_1.Get)(':orderId/html'),
     (0, common_1.Header)('Content-Type', 'text/html; charset=utf-8'),
     __param(0, (0, common_1.Param)('orderId', common_1.ParseIntPipe)),
@@ -43,7 +66,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
-], ReceiptController.prototype, "getReceiptHTML", null);
+], ReceiptController.prototype, "html", null);
 exports.ReceiptController = ReceiptController = __decorate([
     (0, common_1.Controller)('receipt'),
     __metadata("design:paramtypes", [receipt_service_1.ReceiptService])

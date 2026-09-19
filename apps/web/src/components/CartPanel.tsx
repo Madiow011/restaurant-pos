@@ -23,8 +23,15 @@ export default function CartPanel({ tableId, tableName }: Props) {
     setLoading(true);
     try {
       const orderItems = items.map(i => ({ productId: i.product.id, quantity: i.quantity }));
-      if (orderId) { await ordersApi.addItems(orderId, { tableId, items: orderItems }); }
-      else { const o = await ordersApi.create({ tableId, items: orderItems }); setOrderId(o.id); }
+      let oid = orderId;
+      if (oid) {
+        await ordersApi.addItems(oid, { tableId, items: orderItems });
+      } else {
+        const o = await ordersApi.create({ tableId, items: orderItems });
+        oid = o.id;
+        setOrderId(o.id);
+      }
+      if (oid) window.open(`http://localhost:3001/receipt/${oid}/kitchen`, '_blank');
       alert('✅ ส่งออเดอร์ไปครัวแล้ว!');
     } catch (e) { console.error(e); alert('❌ เกิดข้อผิดพลาด'); }
     finally { setLoading(false); }
@@ -85,20 +92,26 @@ export default function CartPanel({ tableId, tableName }: Props) {
       <div className="p-3 space-y-2">
         <button onClick={handleConfirmOrder} disabled={loading || !items.length}
           className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition-colors disabled:opacity-40">
-          {loading ? 'กำลังส่ง...' : '📤 ส่งออเดอร์ไปครัว'}
+          {loading ? 'กำลังส่ง...' : '📤 ส่งครัว + พิมพ์ใบสั่ง'}
         </button>
         <button onClick={() => setShowPayment(true)} disabled={!orderId}
           className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold transition-colors disabled:opacity-40">
           💳 ชำระเงิน
         </button>
         {paidOrderId && (
-          <button onClick={() => setShowReceipt(true)}
-            className="w-full py-2 rounded-xl bg-slate-600 hover:bg-slate-500 text-white text-sm font-medium">
-            🧾 ดูใบเสร็จ
-          </button>
+          <div className="flex gap-2">
+            <button onClick={() => setShowReceipt(true)}
+              className="flex-1 py-2 rounded-xl bg-slate-600 hover:bg-slate-500 text-white text-xs font-medium">
+              🧾 ใบเสร็จลูกค้า
+            </button>
+            <button onClick={() => window.open(`http://localhost:3001/receipt/${paidOrderId}/kitchen`, '_blank')}
+              className="flex-1 py-2 rounded-xl bg-slate-600 hover:bg-slate-500 text-white text-xs font-medium">
+              🖨️ ใบสั่งครัว
+            </button>
+          </div>
         )}
         <button onClick={() => router.push('/')}
-          className="w-full py-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-700 text-sm">
+          className="w-full py-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-700 text-sm transition-colors">
           ← กลับหน้าหลัก
         </button>
       </div>
