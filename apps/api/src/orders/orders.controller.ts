@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Body, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, Query, ParseIntPipe } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto, CheckoutOrderDto } from './dto/create-order.dto';
 
@@ -6,15 +6,14 @@ import { CreateOrderDto, CheckoutOrderDto } from './dto/create-order.dto';
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
+  @Get()
+  findAll(@Query('status') status?: string) { return this.ordersService.findAll(status); }
+
   @Post()
-  create(@Body() dto: CreateOrderDto) {
-    return this.ordersService.create(dto);
-  }
+  create(@Body() dto: CreateOrderDto) { return this.ordersService.create(dto); }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.ordersService.findOne(id);
-  }
+  findOne(@Param('id', ParseIntPipe) id: number) { return this.ordersService.findOne(id); }
 
   @Post(':id/items')
   addItems(@Param('id', ParseIntPipe) id: number, @Body() dto: CreateOrderDto) {
@@ -27,7 +26,5 @@ export class OrdersController {
   }
 
   @Patch(':id/cancel')
-  cancel(@Param('id', ParseIntPipe) id: number) {
-    return this.ordersService.cancel(id);
-  }
+  cancel(@Param('id', ParseIntPipe) id: number) { return this.ordersService.cancel(id); }
 }

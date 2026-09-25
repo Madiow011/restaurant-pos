@@ -1,9 +1,19 @@
 import { PrismaService } from '../prisma/prisma.service';
-import { TableStatus } from '../generated/prisma/client';
 export declare class TablesService {
     private prisma;
     constructor(prisma: PrismaService);
     findAll(): any;
     findOne(id: number): any;
-    updateStatus(id: number, status: TableStatus): any;
+    create(data: {
+        number: number;
+        name?: string;
+        capacity?: number;
+    }): any;
+    update(id: number, data: {
+        name?: string;
+        capacity?: number;
+        status?: any;
+    }): Promise<any>;
+    remove(id: number): Promise<any>;
+    updateStatus(id: number, status: string): any;
 }

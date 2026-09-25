@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { tablesApi } from '@/lib/api';
+import { useAuthStore } from '@/store/authStore';
 import { Table } from '@/types';
 
 const STATUS = {
@@ -13,8 +14,16 @@ const STATUS = {
 
 export default function TableSelectionPage() {
   const router = useRouter();
+  const { user, logout, isAdmin } = useAuthStore();
   const [tables, setTables] = useState<Table[]>([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) { router.push('/login'); return; }
+    fetchTables();
+    const t = setInterval(fetchTables, 10000);
+    return () => clearInterval(t);
+  }, [user]);
 
   const fetchTables = async () => {
     try { setTables(await tablesApi.getAll()); }
@@ -22,39 +31,70 @@ export default function TableSelectionPage() {
     finally { setLoading(false); }
   };
 
-  useEffect(() => {
-    fetchTables();
-    const t = setInterval(fetchTables, 10000);
-    return () => clearInterval(t);
-  }, []);
+  if (!user) return null;
 
   const available = tables.filter(t => t.status === 'AVAILABLE').length;
   const occupied  = tables.filter(t => t.status === 'OCCUPIED').length;
 
+  const handleLogout = () => { logout(); router.push('/login'); };
+
   return (
     <div className="min-h-screen bg-slate-900 text-white">
-      <header className="bg-slate-800 border-b border-slate-700 px-6 py-4 flex items-center justify-between">
+      <header className="bg-slate-800 border-b border-slate-700 px-6 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span className="text-2xl">🍽️</span>
           <div>
-            <h1 className="text-xl font-bold">Restaurant POS</h1>
+            <h1 className="text-lg font-bold">Restaurant POS</h1>
             <p className="text-xs text-slate-400">เลือกโต๊ะเพื่อเริ่มรับออเดอร์</p>
           </div>
         </div>
-        <div className="flex items-center gap-2 text-sm">
-          <span className="bg-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-full">✅ ว่าง {available}</span>
-          <span className="bg-rose-500/20 text-rose-400 px-3 py-1.5 rounded-full">🔴 มีลูกค้า {occupied}</span>
-          <button onClick={fetchTables} className="p-2 hover:bg-slate-700 rounded-lg">🔄</button>
+
+        {/* Status badges */}
+        <div className="hidden md:flex items-center gap-2 text-sm">
+          <span className="bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full text-xs">✅ ว่าง {available}</span>
+          <span className="bg-rose-500/20 text-rose-400 px-3 py-1 rounded-full text-xs">🔴 มีลูกค้า {occupied}</span>
+        </div>
+
+        {/* Nav buttons */}
+        <div className="flex items-center gap-1.5">
+          <button onClick={fetchTables} className="p-2 hover:bg-slate-700 rounded-lg text-slate-400 hover:text-white" title="รีเฟรช">🔄</button>
+          <button onClick={() => router.push('/orders')}
+            className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs text-slate-300 hover:text-white transition-colors">
+            📋 ออเดอร์
+          </button>
           <button onClick={() => router.push('/dashboard')}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-300 hover:text-white transition-colors">
+            className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs text-slate-300 hover:text-white transition-colors">
             📊 Dashboard
           </button>
-          <button onClick={() => router.push('/admin')}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-300 hover:text-white transition-colors">
-            ⚙️ จัดการเมนู
+          <button onClick={() => router.push('/finance')}
+            className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs text-slate-300 hover:text-white transition-colors">
+            💰 บัญชี
           </button>
+          {isAdmin() && (
+            <>
+              <button onClick={() => router.push('/admin')}
+                className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs text-slate-300 hover:text-white transition-colors">
+                ⚙️ เมนู
+              </button>
+              <button onClick={() => router.push('/tables')}
+                className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs text-slate-300 hover:text-white transition-colors">
+                🪑 โต๊ะ
+              </button>
+            </>
+          )}
+          {/* User badge */}
+          <div className="flex items-center gap-2 ml-2 pl-2 border-l border-slate-600">
+            <span className="text-xs text-slate-300">
+              {user.role === 'admin' ? '👑' : '👤'} {user.name}
+            </span>
+            <button onClick={handleLogout}
+              className="px-2 py-1 bg-slate-700 hover:bg-rose-900/50 hover:text-rose-400 rounded-lg text-xs text-slate-400 transition-colors">
+              ออก
+            </button>
+          </div>
         </div>
       </header>
+
       <main className="p-6">
         {loading ? (
           <div className="flex items-center justify-center h-64 text-slate-400">
@@ -63,7 +103,7 @@ export default function TableSelectionPage() {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {tables.map(table => {
-              const cfg = STATUS[table.status];
+              const cfg = STATUS[table.status as keyof typeof STATUS];
               return (
                 <button key={table.id}
                   onClick={() => table.status !== 'CLEANING' && router.push(`/pos/${table.id}`)}

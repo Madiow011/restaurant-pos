@@ -20,23 +20,25 @@ let OrdersController = class OrdersController {
     constructor(ordersService) {
         this.ordersService = ordersService;
     }
-    create(dto) {
-        return this.ordersService.create(dto);
-    }
-    findOne(id) {
-        return this.ordersService.findOne(id);
-    }
+    findAll(status) { return this.ordersService.findAll(status); }
+    create(dto) { return this.ordersService.create(dto); }
+    findOne(id) { return this.ordersService.findOne(id); }
     addItems(id, dto) {
         return this.ordersService.addItems(id, dto);
     }
     checkout(id, dto) {
         return this.ordersService.checkout(id, dto);
     }
-    cancel(id) {
-        return this.ordersService.cancel(id);
-    }
+    cancel(id) { return this.ordersService.cancel(id); }
 };
 exports.OrdersController = OrdersController;
+__decorate([
+    (0, common_1.Get)(),
+    __param(0, (0, common_1.Query)('status')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], OrdersController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Post)(),
     __param(0, (0, common_1.Body)()),

@@ -22,8 +22,7 @@ let TablesService = class TablesService {
             include: {
                 orders: {
                     where: { status: { in: ['OPEN', 'CONFIRMED', 'READY'] } },
-                    orderBy: { createdAt: 'desc' },
-                    take: 1,
+                    orderBy: { createdAt: 'desc' }, take: 1,
                 },
             },
         });
@@ -35,17 +34,32 @@ let TablesService = class TablesService {
                 orders: {
                     where: { status: { in: ['OPEN', 'CONFIRMED', 'READY'] } },
                     include: { orderItems: { include: { product: true } } },
-                    orderBy: { createdAt: 'desc' },
-                    take: 1,
+                    orderBy: { createdAt: 'desc' }, take: 1,
                 },
             },
         });
     }
-    updateStatus(id, status) {
-        return this.prisma.table.update({
-            where: { id },
-            data: { status },
+    create(data) {
+        return this.prisma.table.create({ data });
+    }
+    async update(id, data) {
+        const t = await this.prisma.table.findUnique({ where: { id } });
+        if (!t)
+            throw new common_1.NotFoundException('Table not found');
+        return this.prisma.table.update({ where: { id }, data });
+    }
+    async remove(id) {
+        const t = await this.prisma.table.findUnique({
+            where: { id }, include: { _count: { select: { orders: true } } },
         });
+        if (!t)
+            throw new common_1.NotFoundException('Table not found');
+        if (t._count.orders > 0)
+            throw new common_1.BadRequestException('ไม่สามารถลบโต๊ะที่มีออเดอร์ได้');
+        return this.prisma.table.delete({ where: { id } });
+    }
+    updateStatus(id, status) {
+        return this.prisma.table.update({ where: { id }, data: { status: status } });
     }
 };
 exports.TablesService = TablesService;

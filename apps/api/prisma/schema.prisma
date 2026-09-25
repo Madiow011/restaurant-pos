@@ -104,3 +104,17 @@ model OrderItem {
   product   Product  @relation(fields: [productId], references: [id])
   @@map("order_items")
 }
+
+// ===== FINANCE MODELS (Phase 3 ERP) =====
+
+model Expense {
+  id          Int      @id @default(autoincrement())
+  title       String
+  amount      Float
+  category    String   // เช่น วัตถุดิบ, ค่าแรง, ค่าเช่า, สาธารณูปโภค
+  note        String?
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@map("expenses")
+}

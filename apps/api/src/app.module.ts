@@ -11,9 +11,12 @@ import { OrdersService } from './orders/orders.service';
 import { PaymentModule } from './payment/payment.module';
 import { ReceiptModule } from './receipt/receipt.module';
 import { ReportsModule } from './reports/reports.module';
+import { AuthModule } from './auth/auth.module';
+import { ExportModule } from './export/export.module';
+import { FinanceModule } from './finance/finance.module';
 
 @Module({
-  imports: [PrismaModule, PaymentModule, ReceiptModule, ReportsModule],
+  imports: [PrismaModule, PaymentModule, ReceiptModule, ReportsModule, AuthModule, ExportModule, FinanceModule],
   controllers: [CategoriesController, ProductsController, TablesController, OrdersController],
   providers: [CategoriesService, ProductsService, TablesService, OrdersService],
 })

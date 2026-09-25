@@ -6,6 +6,7 @@ export declare class OrdersService {
     private generateOrderNumber;
     create(dto: CreateOrderDto): Promise<any>;
     findOne(id: number): any;
+    findAll(status?: string): any;
     addItems(orderId: number, dto: CreateOrderDto): Promise<any>;
     checkout(orderId: number, dto: CheckoutOrderDto): Promise<any>;
     cancel(orderId: number): Promise<any>;

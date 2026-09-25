@@ -1,6 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { TableStatus } from '../generated/prisma/client';
 
 @Injectable()
 export class TablesService {
@@ -12,8 +11,7 @@ export class TablesService {
       include: {
         orders: {
           where: { status: { in: ['OPEN', 'CONFIRMED', 'READY'] } },
-          orderBy: { createdAt: 'desc' },
-          take: 1,
+          orderBy: { createdAt: 'desc' }, take: 1,
         },
       },
     });
@@ -26,17 +24,32 @@ export class TablesService {
         orders: {
           where: { status: { in: ['OPEN', 'CONFIRMED', 'READY'] } },
           include: { orderItems: { include: { product: true } } },
-          orderBy: { createdAt: 'desc' },
-          take: 1,
+          orderBy: { createdAt: 'desc' }, take: 1,
         },
       },
     });
   }
 
-  updateStatus(id: number, status: TableStatus) {
-    return this.prisma.table.update({
-      where: { id },
-      data: { status },
+  create(data: { number: number; name?: string; capacity?: number }) {
+    return this.prisma.table.create({ data });
+  }
+
+  async update(id: number, data: { name?: string; capacity?: number; status?: any }) {
+    const t = await this.prisma.table.findUnique({ where: { id } });
+    if (!t) throw new NotFoundException('Table not found');
+    return this.prisma.table.update({ where: { id }, data });
+  }
+
+  async remove(id: number) {
+    const t: any = await this.prisma.table.findUnique({
+      where: { id }, include: { _count: { select: { orders: true } } },
     });
+    if (!t) throw new NotFoundException('Table not found');
+    if (t._count.orders > 0) throw new BadRequestException('ไม่สามารถลบโต๊ะที่มีออเดอร์ได้');
+    return this.prisma.table.delete({ where: { id } });
+  }
+
+  updateStatus(id: number, status: string) {
+    return this.prisma.table.update({ where: { id }, data: { status: status as any } });
   }
 }

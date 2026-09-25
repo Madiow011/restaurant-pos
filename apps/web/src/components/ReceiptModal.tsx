@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const API = 'http://localhost:3001';
 interface Props { orderId: number; onClose: () => void; }
 
 export default function ReceiptModal({ orderId, onClose }: Props) {
@@ -9,15 +10,12 @@ export default function ReceiptModal({ orderId, onClose }: Props) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get(`http://localhost:3001/receipt/${orderId}/data`)
-      .then(r => setData(r.data))
-      .catch(console.error)
-      .finally(() => setLoading(false));
+    axios.get(`${API}/receipt/${orderId}/data`).then(r => setData(r.data)).catch(console.error).finally(() => setLoading(false));
   }, [orderId]);
 
   const fmt = (n: number) => n?.toLocaleString('th-TH', { minimumFractionDigits: 2 }) || '0.00';
   const fmtDate = (d: string) => d ? new Date(d).toLocaleString('th-TH') : '-';
-  const pmLabel: Record<string, string> = { CASH: 'เงินสด', CREDIT_CARD: 'บัตรเครดิต', QR_CODE: 'พร้อมเพย์' };
+  const pmLabel: Record<string, string> = { CASH:'เงินสด', CREDIT_CARD:'บัตรเครดิต', QR_CODE:'พร้อมเพย์' };
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
@@ -28,7 +26,7 @@ export default function ReceiptModal({ orderId, onClose }: Props) {
         </div>
         <div className="flex-1 overflow-y-auto p-5">
           {loading ? <p className="text-center text-gray-400 py-8">กำลังโหลด...</p> : data ? (
-            <div className="text-sm text-gray-800 space-y-2">
+            <div className="text-sm text-gray-800 space-y-2" style={{ fontFamily: "'Sarabun',sans-serif" }}>
               <div className="text-center">
                 <p className="text-lg font-bold">{data.shop.name}</p>
                 <p className="text-xs text-gray-500">{data.shop.address}</p>
@@ -39,14 +37,14 @@ export default function ReceiptModal({ orderId, onClose }: Props) {
                 <div className="flex justify-between"><span>เลขที่:</span><span className="font-bold">{data.order.orderNumber}</span></div>
                 <div className="flex justify-between"><span>โต๊ะ:</span><span>{data.order.tableName}</span></div>
                 <div className="flex justify-between"><span>วันที่:</span><span>{fmtDate(data.order.createdAt)}</span></div>
-                {data.order.paymentMethod && <div className="flex justify-between"><span>ชำระด้วย:</span><span>{pmLabel[data.order.paymentMethod] || data.order.paymentMethod}</span></div>}
+                {data.order.paymentMethod && <div className="flex justify-between"><span>ชำระด้วย:</span><span>{pmLabel[data.order.paymentMethod]||data.order.paymentMethod}</span></div>}
               </div>
               <hr className="border-dashed"/>
               <table className="w-full text-xs">
                 <thead><tr className="border-b"><th className="text-left py-1">รายการ</th><th className="text-center">จำนวน</th><th className="text-right">รวม</th></tr></thead>
                 <tbody>
                   {data.items.map((item: any, i: number) => (
-                    <tr key={i}><td className="py-1">{item.name}</td><td className="text-center">{item.quantity}</td><td className="text-right">{fmt(item.subtotal)}</td></tr>
+                    <tr key={i}><td className="py-1">{item.name}{item.note && <span className="text-gray-400"> ({item.note})</span>}</td><td className="text-center">{item.quantity}</td><td className="text-right">{fmt(item.subtotal)}</td></tr>
                   ))}
                 </tbody>
               </table>
@@ -62,7 +60,7 @@ export default function ReceiptModal({ orderId, onClose }: Props) {
         </div>
         <div className="p-4 border-t flex gap-2">
           <button onClick={onClose} className="flex-1 py-2.5 rounded-xl bg-gray-100 text-gray-700 font-medium hover:bg-gray-200">ปิด</button>
-          <button onClick={() => window.open(`http://localhost:3001/receipt/${orderId}/html`, '_blank')}
+          <button onClick={() => window.open(`${API}/receipt/${orderId}/customer`, '_blank')}
             className="flex-1 py-2.5 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-500">🖨️ พิมพ์</button>
         </div>
       </div>

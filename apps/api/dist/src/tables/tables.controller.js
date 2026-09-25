@@ -15,17 +15,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TablesController = void 0;
 const common_1 = require("@nestjs/common");
 const tables_service_1 = require("./tables.service");
-const client_1 = require("../generated/prisma/client");
 let TablesController = class TablesController {
     constructor(tablesService) {
         this.tablesService = tablesService;
     }
-    findAll() {
-        return this.tablesService.findAll();
+    findAll() { return this.tablesService.findAll(); }
+    findOne(id) { return this.tablesService.findOne(id); }
+    create(body) {
+        return this.tablesService.create(body);
     }
-    findOne(id) {
-        return this.tablesService.findOne(id);
+    update(id, body) {
+        return this.tablesService.update(id, body);
     }
+    remove(id) { return this.tablesService.remove(id); }
     updateStatus(id, status) {
         return this.tablesService.updateStatus(id, status);
     }
@@ -44,6 +46,28 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], TablesController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.Post)(),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], TablesController.prototype, "create", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", void 0)
+], TablesController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], TablesController.prototype, "remove", null);
 __decorate([
     (0, common_1.Patch)(':id/status'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),

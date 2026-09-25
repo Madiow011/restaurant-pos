@@ -3,6 +3,7 @@ import { CreateOrderDto, CheckoutOrderDto } from './dto/create-order.dto';
 export declare class OrdersController {
     private readonly ordersService;
     constructor(ordersService: OrdersService);
+    findAll(status?: string): any;
     create(dto: CreateOrderDto): Promise<any>;
     findOne(id: number): any;
     addItems(id: number, dto: CreateOrderDto): Promise<any>;

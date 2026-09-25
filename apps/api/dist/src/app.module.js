@@ -20,12 +20,15 @@ const orders_service_1 = require("./orders/orders.service");
 const payment_module_1 = require("./payment/payment.module");
 const receipt_module_1 = require("./receipt/receipt.module");
 const reports_module_1 = require("./reports/reports.module");
+const auth_module_1 = require("./auth/auth.module");
+const export_module_1 = require("./export/export.module");
+const finance_module_1 = require("./finance/finance.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule, payment_module_1.PaymentModule, receipt_module_1.ReceiptModule, reports_module_1.ReportsModule],
+        imports: [prisma_module_1.PrismaModule, payment_module_1.PaymentModule, receipt_module_1.ReceiptModule, reports_module_1.ReportsModule, auth_module_1.AuthModule, export_module_1.ExportModule, finance_module_1.FinanceModule],
         controllers: [categories_controller_1.CategoriesController, products_controller_1.ProductsController, tables_controller_1.TablesController, orders_controller_1.OrdersController],
         providers: [categories_service_1.CategoriesService, products_service_1.ProductsService, tables_service_1.TablesService, orders_service_1.OrdersService],
     })

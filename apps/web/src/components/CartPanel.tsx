@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/store/cartStore';
+import { useAuthStore } from '@/store/authStore';
 import { ordersApi } from '@/lib/api';
 import dynamic from 'next/dynamic';
 
@@ -12,17 +13,20 @@ interface Props { tableId: number; tableName: string; }
 
 export default function CartPanel({ tableId, tableName }: Props) {
   const router = useRouter();
-  const { items, orderId, setOrderId, updateQuantity, removeItem, clearCart, subtotal, vatAmount, total } = useCartStore();
+  const { user } = useAuthStore();
+  const { items, orderId, setOrderId, updateQuantity, removeItem, setNote, clearCart, subtotal, vatAmount, total } = useCartStore();
   const [loading, setLoading] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
   const [showReceipt, setShowReceipt] = useState(false);
   const [paidOrderId, setPaidOrderId] = useState<number | null>(null);
+  const [editNoteId, setEditNoteId] = useState<number | null>(null);
+  const [noteText, setNoteText] = useState('');
 
   const handleConfirmOrder = async () => {
     if (!items.length) return;
     setLoading(true);
     try {
-      const orderItems = items.map(i => ({ productId: i.product.id, quantity: i.quantity }));
+      const orderItems = items.map(i => ({ productId: i.product.id, quantity: i.quantity, note: i.note }));
       let oid = orderId;
       if (oid) {
         await ordersApi.addItems(oid, { tableId, items: orderItems });
@@ -49,12 +53,24 @@ export default function CartPanel({ tableId, tableName }: Props) {
     router.push('/');
   };
 
+  const saveNote = (productId: number) => {
+    setNote(productId, noteText);
+    setEditNoteId(null);
+    setNoteText('');
+  };
+
   return (
     <div className="flex flex-col h-full bg-slate-800 border-l border-slate-700 relative">
+      {/* Header */}
       <div className="px-4 py-3 border-b border-slate-700 flex items-center justify-between">
-        <div><h2 className="font-bold text-white">รายการสั่ง</h2><p className="text-xs text-slate-400">{tableName}</p></div>
+        <div>
+          <h2 className="font-bold text-white">รายการสั่ง</h2>
+          <p className="text-xs text-slate-400">{tableName} {user && <span>· {user.name}</span>}</p>
+        </div>
         {orderId && <span className="text-xs bg-indigo-600/30 text-indigo-300 px-2 py-1 rounded-full">#{orderId}</span>}
       </div>
+
+      {/* Items */}
       <div className="flex-1 overflow-y-auto p-3 space-y-2">
         {!items.length ? (
           <div className="flex flex-col items-center justify-center h-32 text-slate-500 text-sm">
@@ -67,8 +83,9 @@ export default function CartPanel({ tableId, tableName }: Props) {
                 <p className="text-sm font-medium text-white truncate">{item.product.name}</p>
                 <p className="text-xs text-indigo-400">฿{item.product.price.toFixed(0)}/ชิ้น</p>
               </div>
-              <button onClick={() => removeItem(item.product.id)} className="text-slate-500 hover:text-rose-400 text-lg">×</button>
+              <button onClick={() => removeItem(item.product.id)} className="text-slate-500 hover:text-rose-400 text-lg leading-none">×</button>
             </div>
+
             <div className="flex items-center justify-between mt-2">
               <div className="flex items-center gap-2">
                 <button onClick={() => updateQuantity(item.product.id, item.quantity - 1)} className="w-7 h-7 rounded-lg bg-slate-600 hover:bg-slate-500 text-white font-bold">−</button>
@@ -77,9 +94,28 @@ export default function CartPanel({ tableId, tableName }: Props) {
               </div>
               <p className="text-sm font-bold text-white">฿{(item.product.price * item.quantity).toFixed(0)}</p>
             </div>
+
+            {/* Note per item */}
+            {editNoteId === item.product.id ? (
+              <div className="mt-2 flex gap-1">
+                <input autoFocus value={noteText} onChange={e => setNoteText(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && saveNote(item.product.id)}
+                  placeholder="หมายเหตุ เช่น ไม่เผ็ด, ไม่ใส่ผัก"
+                  className="flex-1 bg-slate-600 text-white text-xs rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-indigo-500"/>
+                <button onClick={() => saveNote(item.product.id)} className="px-2 py-1 bg-indigo-600 rounded-lg text-xs text-white">✓</button>
+                <button onClick={() => setEditNoteId(null)} className="px-2 py-1 bg-slate-600 rounded-lg text-xs text-slate-300">✕</button>
+              </div>
+            ) : (
+              <button onClick={() => { setEditNoteId(item.product.id); setNoteText(item.note || ''); }}
+                className="mt-1.5 text-xs text-slate-500 hover:text-slate-300 transition-colors">
+                {item.note ? `📝 ${item.note}` : '+ เพิ่มหมายเหตุ'}
+              </button>
+            )}
           </div>
         ))}
       </div>
+
+      {/* Summary */}
       {items.length > 0 && (
         <div className="border-t border-slate-700 px-4 py-3 space-y-1 text-sm">
           <div className="flex justify-between text-slate-400"><span>ยอดก่อน VAT</span><span>฿{subtotal().toFixed(2)}</span></div>
@@ -89,6 +125,8 @@ export default function CartPanel({ tableId, tableName }: Props) {
           </div>
         </div>
       )}
+
+      {/* Buttons */}
       <div className="p-3 space-y-2">
         <button onClick={handleConfirmOrder} disabled={loading || !items.length}
           className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition-colors disabled:opacity-40">
@@ -115,6 +153,7 @@ export default function CartPanel({ tableId, tableName }: Props) {
           ← กลับหน้าหลัก
         </button>
       </div>
+
       {showPayment && orderId && (
         <PaymentModal orderId={orderId} total={total()} onSuccess={handlePaymentSuccess} onClose={() => setShowPayment(false)} />
       )}
